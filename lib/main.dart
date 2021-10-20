@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-void main() {
+Future main() async {
   runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
     home: Home(),
@@ -18,6 +18,7 @@ class Home extends StatefulWidget {
 }
 
 late WebViewController controllerGlobal;
+bool isLoading = true;
 
 class _HomeState extends State<Home> {
   @override
@@ -28,7 +29,7 @@ class _HomeState extends State<Home> {
         onWillPop: () async {
           String? url = await controllerGlobal.currentUrl();
           print(url);
-          if (url.toString() == 'https://www.google.com/') {
+          if (url.toString() == 'https://jatinkamboj.me/') {
             return true;
           } else {
             controllerGlobal.goBack();
@@ -38,16 +39,45 @@ class _HomeState extends State<Home> {
           }
         },
         child: Scaffold(
-          body: SafeArea(
-            child: WebView(
-              initialUrl: 'https://google.com/',
-              javascriptMode: JavascriptMode.unrestricted,
-              onWebViewCreated: (WebViewController webViewController) {
-                controllerGlobal = webViewController;
-              },
+            body: Stack(
+          children: [
+            SafeArea(
+              child: WebView(
+                initialUrl: 'https://jatinkamboj.me/',
+                javascriptMode: JavascriptMode.unrestricted,
+                onWebViewCreated: (WebViewController webViewController) {
+                  controllerGlobal = webViewController;
+                },
+                onPageFinished: (finished) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                },
+              ),
             ),
-          ),
-        ),
+            isLoading
+                ? Scaffold(
+                    backgroundColor: Colors.white,
+                    body: Center(
+                      child: Container(
+                        height: 90,
+                        width: 90,
+                        decoration: BoxDecoration(
+                          color: Colors.purple,
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'JK',
+                            style: TextStyle(color: Colors.white, fontSize: 40),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : Stack(),
+          ],
+        )),
       ),
     );
   }
